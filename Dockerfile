@@ -7,6 +7,9 @@ ENV PATH="${PATH}:/usr/local/go/bin"
 RUN go install github.com/googlecodelabs/tools/claat@latest
 
 FROM denoland/deno:1.23.4 as runner
-COPY --from=0 /root/go/bin/claat /usr/local/bin/claat
+ARG claat_auth
+ENV CLAAT_AUTH_TOKEN=$claat_auth
+COPY --from=builder /root/go/bin/claat /usr/local/bin/claat
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY main.ts .
 CMD ["run", "-A", "main.ts"]
